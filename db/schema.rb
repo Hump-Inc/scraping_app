@@ -10,9 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_02_21_055141) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_27_024835) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "addresses", force: :cascade do |t|
+    t.string "postal_code"
+    t.string "address"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "clinics", force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "director_name"
+    t.string "homepage_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "data", force: :cascade do |t|
     t.string "name"
@@ -20,6 +36,22 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_21_055141) do
     t.string "postal_code"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "address_street"
+    t.string "building_name"
+  end
+
+  create_table "medical_institutions", force: :cascade do |t|
+    t.string "official_name"
+    t.string "postal_code"
+    t.string "address"
+    t.string "fax"
+    t.string "website"
+    t.string "email"
+    t.text "special_notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "official_name_kana"
+    t.string "phone_number"
   end
 
 end
