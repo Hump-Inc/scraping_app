@@ -1,0 +1,2 @@
+class MedicalInstitution < ApplicationRecord
+end
