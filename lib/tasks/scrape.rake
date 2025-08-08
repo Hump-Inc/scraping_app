@@ -1,124 +1,110 @@
+require 'nokogiri'
+require 'open-uri'
+require 'net/http'
+require 'uri'
+
 namespace :scrape do
-  desc "Webサイトからデータを抽出し、DBに保存する"
-  task :save_data => :environment do
-    require 'nokogiri'
-    require 'httparty'
+  desc 'Scrape detail page URLs from the given index pages'
+  task scrape_urls: :environment do
+    index_urls = [
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=1&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=2&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=3&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=4&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=5&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=6&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=7&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=8&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=9&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=10&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=11&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=12&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=13&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=14&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=15&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=16&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=17&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=18&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=19&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=20&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=21&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=22&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=23&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=24&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=25&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=26&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=27&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=28&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=29&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=30&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=31&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=32&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=33&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=34&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=35&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=36&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=37&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=38&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=39&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=40&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=41&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=42&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=43&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=44&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=45&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=46&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=47&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=48&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=49&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=50&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=51&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=52&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=53&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=54&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=55&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=56&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=57&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=58&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=59&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=60&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=61&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=62&size=20&sortNo=1',
+      'https://www.iryou.teikyouseido.mhlw.go.jp/znk-web/juminkanja/S2400/initialize/%E5%A4%A7%E5%88%86%E7%9C%8C/?sjk=1&page=63&size=20&sortNo=1',
+    ]
+    all_detail_urls = []
 
-    # 住所のクリーンアップ用メソッド
-    def clean_address(address)
-      # 正規表現を使用して「徒歩」以降のテキストを取り除く
-      address.gsub(/ .*徒歩.*/, '')
-      # 最初のスペース（全角スペースを含む）以降を削除
-      # address.split(/ | /, 2).first
-    end
-
-    # nameのクリーンアップ用メソッド
-    def clean_name(name)
-      name.split('の').first
-    end
-
-    urls = [
-      "https://job-medley.com/mc/pref13/",
-      "https://job-medley.com/mc/pref13/?page=2",
-      "https://job-medley.com/mc/pref13/?page=3",
-      "https://job-medley.com/mc/pref13/?page=4",
-      "https://job-medley.com/mc/pref13/?page=5",
-      "https://job-medley.com/mc/pref13/?page=6",
-      "https://job-medley.com/mc/pref13/?page=7",
-      "https://job-medley.com/mc/pref13/?page=8",
-      "https://job-medley.com/mc/pref13/?page=9",
-      "https://job-medley.com/mc/pref13/?page=10",
-      "https://job-medley.com/mc/pref13/?page=11",
-      "https://job-medley.com/mc/pref13/?page=12",
-      "https://job-medley.com/mc/pref13/?page=13",
-      "https://job-medley.com/mc/pref13/?page=14",
-      "https://job-medley.com/mc/pref13/?page=15",
-      "https://job-medley.com/mc/pref13/?page=16",
-      "https://job-medley.com/mc/pref13/?page=17",
-      "https://job-medley.com/mc/pref13/?page=18",
-      "https://job-medley.com/mc/pref13/?page=19",
-      "https://job-medley.com/mc/pref13/?page=20",
-      "https://job-medley.com/mc/pref13/?page=21",
-      "https://job-medley.com/mc/pref13/?page=22",
-      "https://job-medley.com/mc/pref13/?page=23",
-      "https://job-medley.com/mc/pref13/?page=24",
-      "https://job-medley.com/mc/pref13/?page=25",
-      "https://job-medley.com/mc/pref13/?page=26",
-      "https://job-medley.com/mc/pref13/?page=27",
-      "https://job-medley.com/mc/pref13/?page=28",
-      "https://job-medley.com/mc/pref13/?page=29",
-      "https://job-medley.com/mc/pref13/?page=30",
-      "https://job-medley.com/mc/pref13/?page=31",
-      "https://job-medley.com/mc/pref13/?page=32",
-      "https://job-medley.com/mc/pref13/?page=33",
-      "https://job-medley.com/mc/pref13/?page=34",
-      "https://job-medley.com/mc/pref13/?page=35",
-      "https://job-medley.com/mc/pref13/?page=36",
-      "https://job-medley.com/mc/pref13/?page=37",
-      "https://job-medley.com/mc/pref13/?page=38",
-      "https://job-medley.com/mc/pref13/?page=39",
-      "https://job-medley.com/mc/pref13/?page=40",
-      "https://job-medley.com/mc/pref13/?page=41",
-      "https://job-medley.com/mc/pref13/?page=42",
-      "https://job-medley.com/mc/pref13/?page=43",
-      "https://job-medley.com/mc/pref13/?page=44",
-      "https://job-medley.com/mc/pref13/?page=45",
-      "https://job-medley.com/mc/pref13/?page=46",
-      "https://job-medley.com/mc/pref13/?page=47",
-      "https://job-medley.com/mc/pref13/?page=48",
-      "https://job-medley.com/mc/pref13/?page=49",
-      "https://job-medley.com/mc/pref13/?page=50",
-      "https://job-medley.com/mc/pref13/?page=51",
-      "https://job-medley.com/mc/pref13/?page=52",
-      "https://job-medley.com/mc/pref13/?page=53",
-      "https://job-medley.com/mc/pref13/?page=54",
-      "https://job-medley.com/mc/pref13/?page=55",
-      "https://job-medley.com/mc/pref13/?page=56",
-      "https://job-medley.com/mc/pref13/?page=57",
-      "https://job-medley.com/mc/pref13/?page=58",
-      "https://job-medley.com/mc/pref13/?page=59",
-      "https://job-medley.com/mc/pref13/?page=60",
-      "https://job-medley.com/mc/pref13/?page=61",
-      "https://job-medley.com/mc/pref13/?page=62",
-      "https://job-medley.com/mc/pref13/?page=63",
-      "https://job-medley.com/mc/pref13/?page=64",
-      "https://job-medley.com/mc/pref13/?page=65",
-      "https://job-medley.com/mc/pref13/?page=66",
-      "https://job-medley.com/mc/pref13/?page=67",
-      "https://job-medley.com/mc/pref13/?page=68",
-      "https://job-medley.com/mc/pref13/?page=69",
-      "https://job-medley.com/mc/pref13/?page=70",
-      "https://job-medley.com/mc/pref13/?page=71",
-      "https://job-medley.com/mc/pref13/?page=72",
-      "https://job-medley.com/mc/pref13/?page=73",
+    user_agents = [
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:55.0) Gecko/20100101 Firefox/55.0',
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/602.3.12 (KHTML, like Gecko) Version/10.0.1 Safari/602.3.12'
     ]
 
-    urls.each do |url|
-      unparsed_page = HTTParty.get(url)
-      parsed_page = Nokogiri::HTML(unparsed_page)
+    index_urls.each do |index_url|
+      uri = URI(index_url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
 
-      parsed_page.css('.o-gutter-row__item').each do |row|
-        name = row.css('a.js-link-extender__target').text.strip
-        address_elements = row.css('p.c-job-offer-card__table-td-txt')
+      request = Net::HTTP::Get.new(uri.request_uri)
+      request['User-Agent'] = user_agents.sample
 
-        address = nil
-        address_elements.each do |element|
-          if element.text.include?("東京都")
-            # 住所のクリーンアップ処理を適用
-            address = clean_address(element.text.strip)
-            break
-          end
-        end
+      response = http.request(request)
+      doc = Nokogiri::HTML(response.body)
 
-        # 住所から郵便番号を検索
-        # postal_code = find_postal_code(address) if address
+      detail_links = doc.css('.resultItems .item h3.name a')
+      detail_urls = detail_links.map { |link| "'#{URI.join(index_url, link['href'])}'" }
+      all_detail_urls.concat(detail_urls)
 
-        # nameのクリーニング
-        cleaned_name = clean_name(name)
-
-        # 条件を満たす場合のみDBに保存
-        Datum.create(name: cleaned_name, address: address) if address
-      end
+      sleep rand(5..10) # リクエスト間にランダムな遅延を追加
+    rescue OpenURI::HTTPError => e
+      puts "An error occurred while trying to fetch the URL: #{e.message}"
+    rescue StandardError => e
+      puts "An unexpected error occurred: #{e.message}"
     end
+
+    # カンマ区切りの形式でURLを結合
+    urls_csv = all_detail_urls.join(',')
+    ScrapedDatum.create(urls: urls_csv)
+    puts 'Scraped URLs have been saved to the database.'
   end
 end

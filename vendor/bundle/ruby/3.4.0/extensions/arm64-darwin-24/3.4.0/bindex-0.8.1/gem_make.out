@@ -1,0 +1,18 @@
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/bindex-0.8.1/ext/skiptrace
+/Users/hisazumimasahito/.rbenv/versions/3.4.2/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20250304-89485-8n2eqd sitelibdir\=./.gem.20250304-89485-8n2eqd clean
+
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20250304-89485-8n2eqd sitelibdir\=./.gem.20250304-89485-8n2eqd
+compiling cruby.c
+linking shared-object skiptrace/internal/cruby.bundle
+
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20250304-89485-8n2eqd sitelibdir\=./.gem.20250304-89485-8n2eqd install
+/usr/local/bin/ginstall -c -m 0755 cruby.bundle ./.gem.20250304-89485-8n2eqd/skiptrace/internal
+
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20250304-89485-8n2eqd sitelibdir\=./.gem.20250304-89485-8n2eqd clean

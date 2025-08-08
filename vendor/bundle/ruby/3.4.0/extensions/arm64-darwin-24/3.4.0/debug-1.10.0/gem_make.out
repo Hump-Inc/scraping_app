@@ -1,0 +1,19 @@
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/debug-1.10.0/ext/debug
+/Users/hisazumimasahito/.rbenv/versions/3.4.2/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/debug-1.10.0/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20250304-89485-ucfsx2 sitelibdir\=./.gem.20250304-89485-ucfsx2 clean
+
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/debug-1.10.0/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20250304-89485-ucfsx2 sitelibdir\=./.gem.20250304-89485-ucfsx2
+compiling debug.c
+compiling iseq_collector.c
+linking shared-object debug/debug.bundle
+
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/debug-1.10.0/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20250304-89485-ucfsx2 sitelibdir\=./.gem.20250304-89485-ucfsx2 install
+/usr/local/bin/ginstall -c -m 0755 debug.bundle ./.gem.20250304-89485-ucfsx2/debug
+
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/debug-1.10.0/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20250304-89485-ucfsx2 sitelibdir\=./.gem.20250304-89485-ucfsx2 clean

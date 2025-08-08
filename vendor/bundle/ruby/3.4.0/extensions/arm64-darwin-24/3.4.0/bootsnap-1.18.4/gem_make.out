@@ -1,0 +1,22 @@
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/bootsnap-1.18.4/ext/bootsnap
+/Users/hisazumimasahito/.rbenv/versions/3.4.2/bin/ruby extconf.rb
+checking for fdatasync() in unistd.h... yes
+checking for whether -D_GNU_SOURCE is accepted as CPPFLAGS... yes
+checking for whether -O3 is accepted as CFLAGS... yes
+checking for whether -std=c99 is accepted as CFLAGS... yes
+creating Makefile
+
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/bootsnap-1.18.4/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20250304-89485-egrvd3 sitelibdir\=./.gem.20250304-89485-egrvd3 clean
+
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/bootsnap-1.18.4/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20250304-89485-egrvd3 sitelibdir\=./.gem.20250304-89485-egrvd3
+compiling bootsnap.c
+linking shared-object bootsnap/bootsnap.bundle
+
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/bootsnap-1.18.4/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20250304-89485-egrvd3 sitelibdir\=./.gem.20250304-89485-egrvd3 install
+/usr/local/bin/ginstall -c -m 0755 bootsnap.bundle ./.gem.20250304-89485-egrvd3/bootsnap
+
+current directory: /Users/hisazumimasahito/scraping_app/vendor/bundle/ruby/3.4.0/gems/bootsnap-1.18.4/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20250304-89485-egrvd3 sitelibdir\=./.gem.20250304-89485-egrvd3 clean
